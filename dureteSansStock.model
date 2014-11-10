@@ -1,0 +1,33 @@
+set VEG ;
+set ANI ;
+set HUILE := VEG union ANI ;
+set MOIS ;
+param lim_veg >= 0 ;
+param lim_ani >= 0 ;
+param prix_vente >= 0 ;
+param prix_achat {MOIS,HUILE} >= 0 ;
+param duretes {HUILE} >= 0;
+param durete_min >= 0;
+param durete_max >= 0;
+param nb_huiles >= 0;
+
+#calc
+var profit_mois {MOIS} >=0 ;
+var achat_mois {MOIS,HUILE} integer >= 0 ;
+
+maximize profit :
+sum {m in MOIS} profit_mois [m];
+
+subject to achat_lim_veg_mois {m in MOIS}:
+sum {v in VEG} achat_mois[m,v] <= lim_veg ;
+
+subject to achat_lim_ani_mois {m in MOIS}:
+sum {a in ANI} achat_mois[m,a] <= lim_ani ;
+
+subject to durete_lim {m in MOIS}:
+(sum {h in HUILE} duretes[h]*achat_mois[m,h])/(sum {h in HUILE} achat_mois[m,h]) <= durete_max;
+
+#calc
+subject to calc_profit_mois {m in MOIS}:
+profit_mois[m] = sum {h in HUILE} (achat_mois[m,h] * prix_vente - achat_mois[m,h]*prix_achat[m,h]) ;
+
