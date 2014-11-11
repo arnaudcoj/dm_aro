@@ -1,0 +1,63 @@
+set VEG ;
+set ANI ;
+set HUILE := VEG union ANI ;
+set MOIS ;
+set MOIS_OUVRES ;
+param lim_veg >= 0 ;
+param lim_ani >= 0 ;
+param prix_vente >= 0 ;
+param prix_achat {MOIS,HUILE} >= 0 ;
+param duretes {HUILE} >= 0;
+param durete_min >= 0;
+param durete_max >= 0;
+param nb_huiles >= 0;
+param stock_max >= 0;
+param stock_init >=0;
+
+#calc
+var profit_mois {MOIS} >=0 ;
+var durete_mois {MOIS} >=0;
+var achat_total {MOIS} >=0;
+
+var stock_mois {MOIS_OUVRES,HUILE} integer >= 0 ;
+var achat_mois {MOIS,HUILE} integer >= 0 ;
+var vente_mois {MOIS,HUILE} integer >= 0 ;
+
+maximize profit :
+sum {m in MOIS} profit_mois [m];
+
+subject to vente_lim_veg_mois {m in MOIS}:
+sum {v in VEG} vente_mois[m,v] <= lim_veg ;
+
+subject to vente_lim_ani_mois {m in MOIS}:
+sum {a in ANI} vente_mois[m,a] <= lim_ani ;
+
+subject to durete_lim_min {m in MOIS} :
+durete_min*achat_total[m] <= durete_mois[m];
+
+subject to durete_lim_max {m in MOIS} :
+durete_mois[m] <= durete_max*achat_total[m] ;
+
+subject to stock_lim_max {m in MOIS, h in HUILE} :
+    stock_mois[m,h] <= stock_max;
+
+subject to stock_initial {h in HUILE} :
+    stock_mois[1,h] = stock_init;
+
+subject to stock_final {h in HUILE} :
+    stock_mois[7,h] = stock_init;
+
+subject to equilibre_stocks {m in MOIS, h in HUILE} :
+    stock_mois[m,h] + achat_mois[m,h] = 
+       stock_mois[m+1,h] + vente_mois[m,h];
+            
+
+#calc
+subject to calc_profit_mois {m in MOIS}:
+profit_mois[m] = sum {h in HUILE} (vente_mois[m,h] * prix_vente - achat_mois[m,h]*prix_achat[m,h]) ;
+
+subject to calc_durete_mois {m in MOIS}:
+durete_mois[m] = sum {h in HUILE} (duretes[h]*achat_mois[m,h]) ;
+
+subject to calc_achat_total {m in MOIS}:
+achat_total[m] = sum {h in HUILE} achat_mois[m,h] ;
