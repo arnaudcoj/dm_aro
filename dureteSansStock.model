@@ -14,6 +14,8 @@ param nb_huiles >= 0;
 #calc
 var profit_mois {MOIS} >=0 ;
 var achat_mois {MOIS,HUILE} integer >= 0 ;
+var durete_mois {MOIS} >=0;
+var achat_total {MOIS} >=0;
 
 maximize profit :
 sum {m in MOIS} profit_mois [m];
@@ -24,10 +26,18 @@ sum {v in VEG} achat_mois[m,v] <= lim_veg ;
 subject to achat_lim_ani_mois {m in MOIS}:
 sum {a in ANI} achat_mois[m,a] <= lim_ani ;
 
-subject to durete_lim {m in MOIS}:
-(sum {h in HUILE} duretes[h]*achat_mois[m,h])/(sum {h in HUILE} achat_mois[m,h]) <= durete_max;
+subject to durete_lim_min {m in MOIS} :
+durete_min*achat_total[m] <= durete_mois[m];
+
+subject to durete_lim_max {m in MOIS} :
+durete_mois[m] <= durete_max*achat_total[m] ;
 
 #calc
 subject to calc_profit_mois {m in MOIS}:
 profit_mois[m] = sum {h in HUILE} (achat_mois[m,h] * prix_vente - achat_mois[m,h]*prix_achat[m,h]) ;
 
+subject to calc_durete_mois {m in MOIS}:
+durete_mois[m] = sum {h in HUILE} (duretes[h]*achat_mois[m,h]) ;
+
+subject to calc_achat_total {m in MOIS}:
+achat_total[m] = sum {h in HUILE} achat_mois[m,h] ;
