@@ -7,7 +7,6 @@ param lim_ani := 250 ;
 param prix_vente := 150 ;
 param durete_min := 3;
 param durete_max := 6;
-param nb_huiles := 5;
 param prix_achat : veg1 veg2 ani1 ani2 ani3 :=
 1janv               110  120  130  110  115
 2fev		   130  130  110   90  115

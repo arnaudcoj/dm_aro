@@ -8,7 +8,6 @@ param lim_ani := 250 ;
 param prix_vente := 150 ;
 param durete_min := 3;
 param durete_max := 6;
-param nb_huiles := 5;
 param stock_init := 500;
 param stock_max := 1000;
 param prix_achat : veg1 veg2 ani1 ani2 ani3 :=
